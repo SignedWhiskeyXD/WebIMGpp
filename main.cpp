@@ -1,7 +1,10 @@
 #include <iostream>
+#include "ImageServer.h"
 
 int main()
 {
-    std::cout<<"Hello, World!"<<std::endl;
+    ImageServer server("127.0.0.1", 52480, ".");
+    server.run();
+
     return 0;
 }
