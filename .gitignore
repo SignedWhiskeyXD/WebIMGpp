@@ -1,0 +1,6 @@
+# CLion configs
+.idea
+
+# CLion CMake outputs
+cmake-build-*
+
