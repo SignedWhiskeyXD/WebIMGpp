@@ -10,7 +10,7 @@ TEST_CASE("QueuePush", "[ThreadingQueue]")
     ThreadingQueue<int> queue;
     const std::size_t nums = 1000;
     for(std::size_t i = 0; i < nums; ++i)
-        queue.enqueue(114514);
+        queue.enqueue(std::make_shared<int>(114514));
 
     REQUIRE(queue.size() == nums);
 }
@@ -20,7 +20,7 @@ TEST_CASE("QueuePop", "[ThreadingQueue]")
     ThreadingQueue<int> queue;
     const std::size_t nums = 1000;
     for(std::size_t i = 0; i < nums; ++i)
-        queue.enqueue(114514);
+        queue.enqueue(std::make_shared<int>(114514));
 
     for(std::size_t i = 0; i < nums; ++i)
         queue.wait_pop();
@@ -44,7 +44,7 @@ TEST_CASE("ThreadingPushPop", "[ThreadingQueue]")
     while(producers.size() != PRODUCER_THREAD_NUM)
         producers.emplace_back([&queue](){
             for(int i = 0; i < PUSH_NUM_PER_PRODUCER; ++i)
-                queue.enqueue(114514);
+                queue.enqueue(std::make_shared<int>(114514));
         });
 
     std::vector<std::thread> workers;

@@ -23,35 +23,28 @@ public:
 
     bool empty() const;
 
-    // 按左值引用，向队列尾部拷贝一个对象
-    void enqueue(const T& newElement){
-        QueueGuard guard(mtx);
-        data.push(std::make_unique<T>(newElement));
-        semaphore.release(1);
-    }
-
     // 按右值引用，向容器尾部移动一个对象
-    void enqueue(T&& newElement){
+    void enqueue(std::shared_ptr<T> newElement){
         QueueGuard guard(mtx);
-        data.push(std::make_unique<T>(std::move(newElement)));
+        data.push(std::move(newElement));
         semaphore.release(1);
     }
 
-    std::unique_ptr<T> wait_pop(){
+    std::shared_ptr<T> wait_pop(){
         semaphore.acquire();
         QueueGuard guard(mtx);
         if(data.empty()) return nullptr;
-        std::unique_ptr<T> ret = std::move(data.front());
+        std::shared_ptr<T> ret(std::move(data.front()));
         data.pop();
         return ret;
     }
 
-    std::unique_ptr<T> try_pop(std::size_t msecs){
+    std::shared_ptr<T> try_pop(std::size_t msecs){
         bool isAcquired = semaphore.try_acquire_for(std::chrono::milliseconds(msecs));
         if(!isAcquired) return nullptr;
 
         QueueGuard guard(mtx);
-        std::unique_ptr<T> ret = std::move(data.front());
+        std::shared_ptr<T> ret(std::move(data.front()));
         data.pop();
         return ret;
     }
@@ -67,7 +60,7 @@ private:
         SEM_LEAST_MAX_VALUE = 1000,
     };
 
-    std::queue<std::unique_ptr<T>> data;
+    std::queue<std::shared_ptr<T>> data;
 
     std::counting_semaphore<SEM_LEAST_MAX_VALUE> semaphore;
 
