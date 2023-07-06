@@ -3,6 +3,7 @@
 //
 
 #include "ThreadPool.h"
+#include "RequestParser.h"
 
 ThreadPool::ThreadPool(int workerNum, bool enableForceStop):
         useForceStop(enableForceStop)
@@ -14,8 +15,12 @@ ThreadPool::ThreadPool(int workerNum, bool enableForceStop):
 
                 auto task = this->taskQueue.wait_pop();
                 if(task == nullptr) continue;
+
                 // TODO: 处理对获取连接的逻辑
                 task->info();
+                RequestParser parser(task);
+                auto result = parser.handle();
+
             }
         });
     }

@@ -10,6 +10,8 @@
 
 class Connection{
 public:
+    friend class RequestParser;
+
     explicit Connection(boost::asio::ip::tcp::socket sock):
         socket(std::move(sock)) { }
 
@@ -26,5 +28,7 @@ public:
 private:
     boost::asio::ip::tcp::socket socket;
 };
+
+using ConnectionPtr = std::shared_ptr<Connection>;
 
 #endif //WEBIMG_CONNECTION_H
