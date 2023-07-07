@@ -19,7 +19,7 @@ ThreadPool::ThreadPool(int workerNum, bool enableForceStop):
                 // TODO: 处理对获取连接的逻辑
                 task->info();
                 RequestParser parser(task);
-                auto result = parser.handle();
+                parser.handle();
 
             }
         });

@@ -18,22 +18,30 @@ void RequestParser::readSocket() {
 
             std::string_view view(buffer.begin(), buffer.begin() + length);
             std::stringstream ss(view.data());
-            auto [parseFlag, request] = parseRequest(ss);
+            connection->request = parseRequest(ss).second;
 
             // TODO: 已经解析好请求，响应之
+            auto builder = ResponseBuilder(std::make_shared<HTTPRequest>(connection->request));
+            connection->response = builder.getResponse();
+
+            writeSocket(connection);
         });
 }
 
-HTTPRequest RequestParser::handle() {
-    HTTPRequest request;
-    readSocket();
-    return request;
+void RequestParser::writeSocket(ConnectionPtr self) {
+    boost::asio::async_write(self->socket, self->toAsioBuffers(),
+        [this, self](boost::system::error_code ec, std::size_t length){
+            if (!ec)
+            {
+                boost::system::error_code ignored_ec;
+                self->socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both,
+                                      ignored_ec);
+            }
+        });
 }
 
-bool RequestParser::isValidFirstLine(HTTPRequest &request) {
-    if(request.method.empty() || request.uri.empty() || request.httpVersion.empty())
-        return false;
-    return true;
+void RequestParser::handle() {
+    readSocket();
 }
 
 std::pair<int, HTTPRequest> RequestParser::parseRequest(std::istream &requestStream) {
@@ -69,6 +77,7 @@ std::pair<int, HTTPRequest> RequestParser::parseRequest(std::istream &requestStr
             }
         }
     }
+    // TODO: 存在未覆盖返回内容的分支
 }
 
 int RequestParser::parseFirstLine(HTTPRequest &parsedRequest, std::stringstream &lineStream) {
@@ -92,3 +101,5 @@ int RequestParser::parseHeaders(HTTPRequest &parsedRequest, std::stringstream &l
     return !currentHeader.first.empty() &&
            !currentHeader.second.empty() ? CONTINUE : BAD_HEADER_CONTINUE;
 }
+
+

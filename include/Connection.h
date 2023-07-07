@@ -7,6 +7,8 @@
 
 #include <boost/asio.hpp>
 #include <spdlog/spdlog.h>
+#include "HTTPResponse.h"
+#include "HTTPRequest.h"
 
 class Connection{
 public:
@@ -27,6 +29,24 @@ public:
 
 private:
     boost::asio::ip::tcp::socket socket;
+
+    HTTPRequest request;
+
+    HTTPResponse response;
+
+    std::vector<boost::asio::const_buffer> toAsioBuffers(){
+        auto ret = std::vector<boost::asio::const_buffer>();
+
+        ret.emplace_back(boost::asio::buffer(response.httpVersion + " " +
+                                          std::to_string(response.status) + " "
+                                          + response.isOK + "\r\n"));
+        for(const auto& header : response.headers)
+            ret.emplace_back(boost::asio::buffer(header.first + ": " + header.second + "\r\n"));
+        ret.emplace_back(boost::asio::buffer("\r\n"));
+        ret.emplace_back(boost::asio::buffer(response.payload));
+
+        return ret;
+    }
 };
 
 using ConnectionPtr = std::shared_ptr<Connection>;

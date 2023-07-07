@@ -8,20 +8,25 @@
 #include <string_view>
 #include "Connection.h"
 #include "HTTPRequest.h"
+#include "ResponseBuilder.h"
 
 class RequestParser {
 public:
     explicit RequestParser(ConnectionPtr conn, std::string_view api_uri = "/api"):
         connection(std::move(conn)), uri(api_uri), buffer() {}
 
-    HTTPRequest handle();
+    void handle();
 
     static std::pair<int, HTTPRequest> parseRequest(std::istream& requestStream);
 
 private:
     void readSocket();
 
-    static bool isValidFirstLine(HTTPRequest& request);
+    void writeSocket(ConnectionPtr self);
+
+    static int parseFirstLine(HTTPRequest &parsedRequest, std::stringstream &lineStream);
+
+    static int parseHeaders(HTTPRequest &parsedRequest, std::stringstream &lineStream);
 
     std::string uri;
 
@@ -39,10 +44,6 @@ private:
     };
 
     std::array<char, 8192> buffer;
-
-    static int parseFirstLine(HTTPRequest &parsedRequest, std::stringstream &lineStream);
-
-    static int parseHeaders(HTTPRequest &parsedRequest, std::stringstream &lineStream);
 };
 
 

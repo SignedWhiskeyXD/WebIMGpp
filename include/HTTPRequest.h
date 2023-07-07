@@ -7,6 +7,7 @@
 
 #include <string>
 #include <map>
+#include <memory>
 
 struct HTTPRequest{
     std::string method;
@@ -15,5 +16,7 @@ struct HTTPRequest{
     std::map<std::string, std::string> headers;
     std::string payload;
 };
+
+using RequestPtr = std::shared_ptr<HTTPRequest>;
 
 #endif //WEBIMG_HTTPREQUEST_H
