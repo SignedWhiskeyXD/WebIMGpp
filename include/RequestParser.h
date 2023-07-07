@@ -22,7 +22,7 @@ public:
 private:
     void readSocket();
 
-    void writeSocket(ConnectionPtr self);
+    void writeSocket();
 
     static int parseFirstLine(HTTPRequest &parsedRequest, std::stringstream &lineStream);
 

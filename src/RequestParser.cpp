@@ -24,12 +24,13 @@ void RequestParser::readSocket() {
             auto builder = ResponseBuilder(std::make_shared<HTTPRequest>(connection->request));
             connection->response = builder.getResponse();
 
-            writeSocket(connection);
+            writeSocket();
         });
 }
 
-void RequestParser::writeSocket(ConnectionPtr self) {
-    boost::asio::async_write(self->socket, self->toAsioBuffers(),
+void RequestParser::writeSocket() {
+    auto self(this->connection);
+    boost::asio::async_write(self->socket, self->response.toAsioBuffers(),
         [this, self](boost::system::error_code ec, std::size_t length){
             if (!ec)
             {

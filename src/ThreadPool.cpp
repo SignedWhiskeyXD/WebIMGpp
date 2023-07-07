@@ -20,7 +20,6 @@ ThreadPool::ThreadPool(int workerNum, bool enableForceStop):
                 task->info();
                 RequestParser parser(task);
                 parser.handle();
-
             }
         });
     }
