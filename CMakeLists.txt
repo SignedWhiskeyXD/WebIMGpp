@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.25)
 project(WebIMG)
 
 set(CMAKE_CXX_STANDARD 20)
-set(ENABLE_UNIT_TEST ON)
+set(ENABLE_UNIT_TEST OFF)
 
 find_package(Boost REQUIRED)
 find_package(spdlog REQUIRED)

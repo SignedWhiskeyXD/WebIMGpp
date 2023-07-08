@@ -6,10 +6,10 @@
 #include "ImageServer.h"
 #include "Connection.h"
 
-ImageServer::ImageServer(std::string_view address, uint16_t port, std::string_view root):
+ImageServer::ImageServer(std::string_view address, uint16_t port):
         ioContext(1),
         acceptor(ioContext, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port)),
-        threadPool(8)
+        threadPool(true)
 {
     do_accept();
 }
@@ -17,6 +17,7 @@ ImageServer::ImageServer(std::string_view address, uint16_t port, std::string_vi
 void ImageServer::run() {
     if(acceptor.is_open())
         spdlog::info("starting");
+    threadPool.init(8);
     ioContext.run();
 }
 
@@ -32,7 +33,11 @@ void ImageServer::do_accept() {
             if (!acceptor.is_open()) return;
 
             if (!ec){
-                threadPool.commit(std::make_shared<Connection>(std::move(socket)));
+                auto newConnection = std::make_shared<Connection>
+                    (std::move(socket), connectionPool);
+                connectionPool.addConnection(newConnection);
+                newConnection->handle();
+                // threadPool.commit(newConnection);
             }
 
             do_accept();

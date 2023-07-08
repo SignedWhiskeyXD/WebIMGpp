@@ -7,11 +7,11 @@
 
 #include <boost/asio.hpp>
 #include "ThreadPool.h"
-
+#include "ConnectionPool.h"
 
 class ImageServer{
 public:
-    ImageServer(std::string_view address, uint16_t port, std::string_view root);
+    ImageServer(std::string_view address, uint16_t port);
 
     ImageServer() = delete;
 
@@ -31,6 +31,8 @@ private:
     boost::asio::ip::tcp::acceptor acceptor;
 
     ThreadPool threadPool;
+
+    ConnectionPool connectionPool;
 };
 
 #endif //WEBIMG_IMAGESERVER_H

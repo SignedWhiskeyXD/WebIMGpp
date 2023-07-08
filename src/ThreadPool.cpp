@@ -5,43 +5,62 @@
 #include "ThreadPool.h"
 #include "RequestParser.h"
 
-ThreadPool::ThreadPool(int workerNum, bool enableForceStop):
-        useForceStop(enableForceStop)
-{
+ThreadPool::ThreadPool(bool enableForceStop):
+        useForceStop(enableForceStop) {}
+
+void ThreadPool::init(int workerNum){
     while(workers.size() < workerNum){
-        workers.emplace_back([this](){
-            while(true){
-                if(stop && taskQueue.empty() || stopNow) return;
-
-                auto task = this->taskQueue.wait_pop();
-                if(task == nullptr) continue;
-
-                // TODO: 处理对获取连接的逻辑
-                task->info();
-                RequestParser parser(task);
-                parser.handle();
-            }
-        });
+        workers.emplace_back(&ThreadPool::workerTask, this);
     }
 }
 
 void ThreadPool::waitStop() noexcept {
-    stop = true;
-    taskQueue.releaseFor(workers.size());
+    {
+        Guard guard(mtx);
+        stop = true;
+    }
+    cv_process_stop.notify_all();
+
     for(auto& t : workers)
         if(t.joinable()) t.join();
 }
 
 void ThreadPool::forceStop() noexcept {
-    stop = true;
-    stopNow = true;
-    taskQueue.releaseFor(workers.size());
+    {
+        Guard guard(mtx);
+        stop = true;
+        stopNow = true;
+    }
+    cv_process_stop.notify_all();
+
     for(auto& t : workers)
         if(t.joinable()) t.join();
 }
 
-bool ThreadPool::commit(std::shared_ptr<Connection> connection) {
+bool ThreadPool::commit(ConnectionPtr connection) {
     if(stop) return false;
-    taskQueue.enqueue(std::move(connection));
+    {
+        Guard guard(mtx);
+        connections.push(connection);
+    }
+    cv_process_stop.notify_one();
     return true;
+}
+
+void ThreadPool::workerTask() {
+    while(true){
+        uGuard locker(mtx);
+        cv_process_stop.wait(locker, [this]()->bool{
+            return stop || !connections.empty();
+        });
+        
+        if(stopNow || (stop && connections.empty())) return;
+
+        ConnectionPtr newConnection = connections.front();
+        connections.pop();
+        locker.unlock();
+
+        // TODO: 处理对获取连接的逻辑
+        newConnection->handle();
+    }
 }

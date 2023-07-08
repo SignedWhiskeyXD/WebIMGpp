@@ -1,6 +1,7 @@
-# CLion configs
+# IDE configs
 .idea
+.vscode
 
-# CLion CMake outputs
+# CMake outputs
 cmake-build-*
-
+build

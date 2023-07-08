@@ -5,13 +5,18 @@
 #ifndef WEBIMG_THREADPOOL_H
 #define WEBIMG_THREADPOOL_H
 
-#include <functional>
-#include "ThreadingQueue.h"
+#include <unordered_set>
+#include <queue>
+#include <condition_variable>
 #include "Connection.h"
 
 class ThreadPool final {
+    using Guard = std::lock_guard<std::mutex>;
+
+    using uGuard = std::unique_lock<std::mutex>;
+
 public:
-    explicit ThreadPool(int workerNum, bool enableForceStop = true);
+    explicit ThreadPool(bool enableForceStop);
 
     ThreadPool() = delete;
 
@@ -26,8 +31,10 @@ public:
             waitStop();
     }
 
+    void init(int workerNum);
+
     // 将一个任务加入到任务队列
-    bool commit(std::shared_ptr<Connection> connection);
+    bool commit(ConnectionPtr connection);
 
     // 等待所有任务完成后停止
     void waitStop() noexcept;
@@ -36,9 +43,15 @@ public:
     void forceStop() noexcept;
 
 private:
-    ThreadingQueue<Connection> taskQueue;
+    void workerTask();
+
+    std::queue<ConnectionPtr> connections;
 
     std::vector<std::thread> workers;
+
+    std::condition_variable cv_process_stop;
+
+    std::mutex mtx;
 
     bool useForceStop;
 
