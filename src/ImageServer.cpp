@@ -36,8 +36,7 @@ void ImageServer::do_accept() {
                 auto newConnection = std::make_shared<Connection>
                     (std::move(socket), connectionPool);
                 connectionPool.addConnection(newConnection);
-                newConnection->handle();
-                // threadPool.commit(newConnection);
+                threadPool.commit(newConnection);
             }
 
             do_accept();
