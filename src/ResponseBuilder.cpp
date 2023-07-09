@@ -15,9 +15,7 @@ HTTPResponse ResponseBuilder::getResponse() {
 }
 
 void ResponseBuilder::setFirstLineOK(HTTPResponse &response) {
-    response.httpVersion = "HTTP/1.1";
-    response.status = 200;
-    response.isOK = "OK";
+    response.firstLineWithCRLF = "HTTP/1.1 200 OK\r\n";
 }
 
 void ResponseBuilder::setDefaultHeaders(HTTPResponse &response) {

@@ -19,4 +19,6 @@ struct HTTPRequest{
 
 using RequestPtr = std::shared_ptr<HTTPRequest>;
 
+using RequestHeader = std::map<std::string, std::string>;
+
 #endif //WEBIMG_HTTPREQUEST_H

@@ -4,6 +4,7 @@
 
 #include "Connection.h"
 #include "ConnectionPool.h"
+#include "ServletMatcher.h"
 
 void Connection::handle(){
     readSocket();
@@ -28,9 +29,13 @@ void Connection::readSocket() {
                     request = RequestParser::parseRequest(ss).second;
 
                     // TODO: 已经解析好请求，响应之
-                    auto builder = ResponseBuilder(std::make_shared<HTTPRequest>(request));
-                    response = builder.getResponse();
-
+                    auto servlet = ServletMatcher::getInstance().match(request);
+                    if(servlet != nullptr)
+                        response = servlet->onHandle(request);
+                    else {
+                        response.firstLineWithCRLF = "HTTP/1.1 400 Bad Request\r\n";
+                        response.setDefaultHeaders();
+                    }
                     writeSocket();
                 }
             }

@@ -12,32 +12,55 @@
 #include <boost/asio.hpp>
 
 struct HTTPResponse{
-    std::string httpVersion;
-    int status;
+    std::string httpVersion = "HTTP/1.1";
+    std::string status;
     std::string isOK;
+    std::string firstLineWithCRLF;
     std::map<std::string, std::string> headers;
 
     std::string payload;
 
     std::vector<boost::asio::const_buffer> toAsioBuffers();
+
+    HTTPResponse& setFirstLineOK(){
+        firstLineWithCRLF = "HTTP/1.1 200 OK\r\n";
+        return *this;
+    }
+
+    HTTPResponse& setDefaultHeaders(){
+        static std::pair<std::string, std::string> defaultHeaders ={
+                "Server", "WebIMGpp experimental"
+        };
+        headers.insert(defaultHeaders);
+        return *this;
+    }
 };
 
 inline std::vector<boost::asio::const_buffer> HTTPResponse::toAsioBuffers() {
-    static const std::string firstLineOK = "HTTP/1.1 200 OK\r\n";
+    static const std::string space = " ";
     static const std::string betweenHeader = ": ";
-    static const std::string newLine = "\r\n";
+    static const std::string CRLF = "\r\n";
     using boost::asio::buffer;
 
     std::vector<boost::asio::const_buffer> ret;
-    ret.emplace_back(buffer(firstLineOK));
+    if(firstLineWithCRLF.empty()){
+        ret.emplace_back(buffer(httpVersion));
+        ret.emplace_back(buffer(space));
+        ret.emplace_back(buffer(status));
+        ret.emplace_back(buffer(space));
+        ret.emplace_back(buffer(isOK));
+        ret.emplace_back(buffer(CRLF));
+    }else{
+        ret.emplace_back(buffer(firstLineWithCRLF));
+    }
 
     for(const auto& header : headers) {
         ret.emplace_back(buffer(header.first));
         ret.emplace_back(buffer(betweenHeader));
         ret.emplace_back(buffer(header.second));
-        ret.emplace_back(buffer(newLine));
+        ret.emplace_back(buffer(CRLF));
     }
-    ret.emplace_back(buffer(newLine));
+    ret.emplace_back(buffer(CRLF));
     ret.emplace_back(buffer(payload));
 
     return ret;

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.25)
 project(WebIMG)
 
 set(CMAKE_CXX_STANDARD 20)
-set(ENABLE_UNIT_TEST OFF)
+set(ENABLE_UNIT_TEST ON)
 
 find_package(Boost REQUIRED)
 find_package(spdlog REQUIRED)
@@ -29,7 +29,9 @@ endif ()
 if(${ENABLE_UNIT_TEST})
     foreach (testCase IN LISTS TESTs)
         get_filename_component(testCaseName ${testCase} NAME_WE)
-        add_executable(${testCaseName} ${testCase} ./include/ThreadingQueue.h)
-        target_link_libraries(${testCaseName} PRIVATE Catch2::Catch2 Catch2::Catch2WithMain)
+        add_executable(${testCaseName} ${testCase} ${SRCs} ${HEADERs})
+        target_link_libraries(${testCaseName} PRIVATE
+                Catch2::Catch2 Catch2::Catch2WithMain
+                spdlog::spdlog)
     endforeach ()
 endif ()
