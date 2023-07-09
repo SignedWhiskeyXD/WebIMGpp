@@ -33,8 +33,9 @@ void Connection::readSocket() {
                     if(servlet != nullptr)
                         response = servlet->onHandle(request);
                     else {
-                        response.firstLineWithCRLF = "HTTP/1.1 400 Bad Request\r\n";
+                        response.firstLineWithCRLF = "HTTP/1.1 400 Not Found\r\n";
                         response.setDefaultHeaders();
+                        response.payload = "API ERROR!";
                     }
                     writeSocket();
                 }

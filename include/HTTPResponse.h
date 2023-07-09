@@ -28,10 +28,13 @@ struct HTTPResponse{
     }
 
     HTTPResponse& setDefaultHeaders(){
-        static std::pair<std::string, std::string> defaultHeaders ={
-                "Server", "WebIMGpp experimental"
+        static std::map<std::string, std::string> defaultHeaders ={
+                {"Server", "WebIMGpp experimental"},
+                {"Connection", "Keep-Alive"}
         };
-        headers.insert(defaultHeaders);
+
+        for(const auto& pa : defaultHeaders)
+            headers.insert(pa);
         return *this;
     }
 };
