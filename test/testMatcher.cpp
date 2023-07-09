@@ -4,7 +4,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include "ImageServer.h"
-#include "HelloServlet.h"
+#include "Servlet/HelloServlet.h"
 #include "ServletMatcher.h"
 
 TEST_CASE("testMatcher")

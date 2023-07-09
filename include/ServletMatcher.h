@@ -6,10 +6,11 @@
 #define WEBIMG_SERVLETMATCHER_H
 
 #include <unordered_map>
-#include "IMGServlet.h"
+#include "Servlet/ServletBase.h"
 
 class ServletMatcher{
 public:
+    ServletMatcher() = default;
 
     static ServletMatcher& getInstance(){
         static ServletMatcher instance;

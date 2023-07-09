@@ -1,6 +1,6 @@
 #include <iostream>
 #include "ImageServer.h"
-#include "HelloServlet.h"
+#include "Servlet/HelloServlet.h"
 #include "ServletMatcher.h"
 
 int main()

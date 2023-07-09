@@ -5,14 +5,17 @@
 #ifndef WEBIMG_HELLOSERVLET_H
 #define WEBIMG_HELLOSERVLET_H
 
-#include "IMGServlet.h"
+#include "ServletBase.h"
+#include "ResponseBuilder.h"
 
-class HelloServlet : public IMGServlet{
+class HelloServlet : public ServletBase{
 public:
+    HelloServlet() = default;
 
     HTTPResponse onHandle(HTTPRequest& request) override;
 
-
+private:
+    ResponseBuilder builder;
 };
 
 #endif //WEBIMG_HELLOSERVLET_H

@@ -13,8 +13,8 @@
 
 struct HTTPResponse{
     std::string httpVersion = "HTTP/1.1";
-    std::string status;
-    std::string isOK;
+    std::string statusCode;
+    std::string statusMessage;
     std::string firstLineWithCRLF;
     std::map<std::string, std::string> headers;
 
@@ -49,9 +49,9 @@ inline std::vector<boost::asio::const_buffer> HTTPResponse::toAsioBuffers() {
     if(firstLineWithCRLF.empty()){
         ret.emplace_back(buffer(httpVersion));
         ret.emplace_back(buffer(space));
-        ret.emplace_back(buffer(status));
+        ret.emplace_back(buffer(statusCode));
         ret.emplace_back(buffer(space));
-        ret.emplace_back(buffer(isOK));
+        ret.emplace_back(buffer(statusMessage));
         ret.emplace_back(buffer(CRLF));
     }else{
         ret.emplace_back(buffer(firstLineWithCRLF));
