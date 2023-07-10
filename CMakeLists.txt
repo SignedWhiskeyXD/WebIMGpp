@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.25)
+cmake_minimum_required(VERSION 3.22)
 project(WebIMG)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -16,7 +16,9 @@ file(GLOB SERVLETs Servlet/*.cpp Servlet/*.h)
 
 set(WebIMGFiles ${SRCs} ${HEADERs} ${SERVLETs})
 
-add_definitions(-D_WIN32_WINNT=0x0A00)
+if(WIN32)
+    add_definitions(-D_WIN32_WINNT=0x0A00)
+endif()
 
 add_executable(WebIMG main.cpp ${WebIMGFiles})
 target_link_libraries(WebIMG PRIVATE spdlog::spdlog)
