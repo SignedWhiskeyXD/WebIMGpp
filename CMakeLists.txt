@@ -4,11 +4,8 @@ project(WebIMG)
 set(CMAKE_CXX_STANDARD 20)
 set(ENABLE_UNIT_TEST ON)
 
-find_package(Boost REQUIRED)
+find_package(Boost REQUIRED COMPONENTS)
 find_package(spdlog REQUIRED)
-if(${ENABLE_UNIT_TEST})
-    find_package(Catch2 CONFIG REQUIRED)
-endif()
 
 include_directories(${Boost_INCLUDE_DIR})
 include_directories(./include .)
@@ -16,11 +13,12 @@ include_directories(./include .)
 file(GLOB SRCs src/*.cpp)
 file(GLOB HEADERs include/*.h)
 file(GLOB SERVLETs Servlet/*.cpp Servlet/*.h)
-file(GLOB TESTs test/*.cpp)
+
+set(WebIMGFiles ${SRCs} ${HEADERs} ${SERVLETs})
 
 add_definitions(-D_WIN32_WINNT=0x0A00)
 
-add_executable(WebIMG main.cpp ${SRCs} ${HEADERs} ${SERVLETs})
+add_executable(WebIMG main.cpp ${WebIMGFiles})
 target_link_libraries(WebIMG PRIVATE spdlog::spdlog)
 
 if(MSVC)
@@ -28,11 +26,5 @@ if(MSVC)
 endif ()
 
 if(${ENABLE_UNIT_TEST})
-    foreach (testCase IN LISTS TESTs)
-        get_filename_component(testCaseName ${testCase} NAME_WE)
-        add_executable(${testCaseName} ${testCase} ${SRCs} ${HEADERs} ${SERVLETs})
-        target_link_libraries(${testCaseName} PRIVATE
-                Catch2::Catch2 Catch2::Catch2WithMain
-                spdlog::spdlog)
-    endforeach ()
+    add_subdirectory(test)
 endif ()

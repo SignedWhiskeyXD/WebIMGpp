@@ -19,9 +19,9 @@ public:
 
     ResponseBuilder& setStatus(uint16_t code, std::string_view message);
 
-    ResponseBuilder& setFirstLine(std::string_view firstLine);
+    ResponseBuilder& setFirstLine(std::string_view firstLineNoCRLF);
 
-    ResponseBuilder& setHeader(std::pair<std::string, std::string> header);
+    ResponseBuilder& setHeader(const std::pair<std::string, std::string>& header);
 
     ResponseBuilder& setHeader(std::string_view key, std::string_view val);
 

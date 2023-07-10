@@ -17,6 +17,9 @@ ServletPtr ServletMatcher::match(HTTPRequest &request) {
     for(auto i = request.uri.begin(); i != request.uri.end(); ++i){
         if(*i == '/') candidates.push(i);
     }
+    auto query = request.uri.find('?');
+    if(query != std::string::npos)
+        candidates.push(request.uri.begin() + query);
     candidates.push(request.uri.end());
 
     while(!candidates.empty()){

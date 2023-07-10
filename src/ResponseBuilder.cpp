@@ -24,7 +24,7 @@ ResponseBuilder &ResponseBuilder::setStatus(uint16_t code, std::string_view mess
     return *this;
 }
 
-ResponseBuilder &ResponseBuilder::setHeader(std::pair<std::string, std::string> header) {
+ResponseBuilder &ResponseBuilder::setHeader(const std::pair<std::string, std::string>& header) {
     response.headers.insert(header);
     return *this;
 }
