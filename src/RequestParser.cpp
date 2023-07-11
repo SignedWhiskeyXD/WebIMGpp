@@ -63,31 +63,32 @@ int RequestParser::parseHeaders(HTTPRequest &parsedRequest, std::string_view lin
            !currentHeader.second.empty() ? CONTINUE : BAD_HEADER_CONTINUE;
 }
 
-std::unordered_map<std::string_view, std::string_view> RequestParser::parseForm(std::string_view formString) {
-    std::unordered_map<std::string_view, std::string_view> result;
+// ChatGPT写的
+std::unordered_map<std::string, std::string> RequestParser::parseForm(const std::string &formString) {
+    std::unordered_map<std::string, std::string> result;
 
     size_t pos = 0;
-    while (pos != std::string_view::npos) {
+    while (pos != std::string::npos) {
         // 查找等号的位置
         size_t equalPos = formString.find('=', pos);
-        if (equalPos == std::string_view::npos) {
+        if (equalPos == std::string::npos) {
             break; // 如果找不到等号，结束循环
         }
 
         // 提取键
-        std::string_view key = formString.substr(pos, equalPos - pos);
+        std::string key = formString.substr(pos, equalPos - pos);
 
         // 查找下一个键值对的起始位置
         size_t ampPos = formString.find('&', equalPos);
 
         // 提取值，如果找不到下一个键值对，则提取到字符串末尾
-        std::string_view value = formString.substr(equalPos + 1, ampPos - equalPos - 1);
+        std::string value = formString.substr(equalPos + 1, ampPos - equalPos - 1);
 
         // 存储键值对到结果中
         result[key] = value;
 
         // 更新下一个键值对的起始位置
-        pos = (ampPos == std::string_view::npos) ? ampPos : ampPos + 1;
+        pos = (ampPos == std::string::npos) ? ampPos : ampPos + 1;
     }
 
     return result;

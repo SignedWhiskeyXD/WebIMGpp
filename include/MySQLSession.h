@@ -15,16 +15,16 @@ public:
 
     void test(const char *name, boost::mysql::results& result);
 
+    std::size_t selectUserByName(std::string_view username);
+
 private:
-    void executeTest(const char *name, boost::mysql::results& result);
+    boost::mysql::statement blockingPrepare(std::string_view sql);
 
     SQLSessionPool& poolHandler;
 
     boost::mysql::tcp_ssl_connection sqlConnection;
 
     boost::mysql::diagnostics diag;
-
-    boost::mysql::statement nextStmt;
 };
 
 using MySQLPtr = std::shared_ptr<MySQLSession>;

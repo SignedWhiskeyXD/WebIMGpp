@@ -8,6 +8,7 @@
 #include <boost/asio.hpp>
 #include "ThreadPool.h"
 #include "ConnectionPool.h"
+#include "SQLSessionPool.h"
 
 class ImageServer{
 public:
@@ -33,6 +34,8 @@ private:
     ThreadPool threadPool;
 
     ConnectionPool connectionPool;
+
+    SQLSessionPool sqlSessionPool;
 };
 
 #endif //WEBIMG_IMAGESERVER_H

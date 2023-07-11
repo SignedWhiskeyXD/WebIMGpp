@@ -11,7 +11,7 @@
 
 class SQLSessionPool {
 public:
-    SQLSessionPool(boost::asio::io_context& ctx, std::string_view host,
+    SQLSessionPool(std::string_view host,
                    const boost::mysql::handshake_params& params, unsigned int num);
 
     MySQLPtr waitPop();
@@ -26,7 +26,7 @@ public:
 private:
     void init() noexcept;
 
-    boost::asio::io_context& ioContext;
+    boost::asio::io_context ioContext;
 
     boost::asio::ssl::context sslContext;
 

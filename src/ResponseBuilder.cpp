@@ -119,7 +119,7 @@ HTTPResponse ResponseBuilder::NotFound() {
                                     "  <p>404 Not Found</p>\n"
                                     "</body>\n"
                                     "</html>";
-    setStatus(400, "Bad Request");
+    setStatus(404, "Not Found");
     contentType("text/html");
     setPayload(payload404);
     return response;

@@ -5,12 +5,23 @@
 #include <spdlog/spdlog.h>
 #include "ImageServer.h"
 #include "Connection.h"
+#include "Servlet/HelloServlet.h"
+#include "Servlet/Register.h"
+#include "Servlet/Login.h"
+#include "ServletMatcher.h"
 
 ImageServer::ImageServer(std::string_view address, uint16_t port):
         ioContext(1),
         acceptor(ioContext, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port)),
-        threadPool(true)
+        threadPool(true),
+        sqlSessionPool(address, boost::mysql::handshake_params("root", "wsmrxd", "db1"), 8)
 {
+    ServletPtr hello = std::make_shared<HelloServlet>();
+    ServletPtr regi = std::make_shared<Register>();
+    ServletPtr login = std::make_shared<Login>(sqlSessionPool);
+    ServletMatcher::getInstance().addRule("/hello", hello);
+    ServletMatcher::getInstance().addRule("/register", regi);
+    ServletMatcher::getInstance().addRule("/login", login);
     do_accept();
 }
 

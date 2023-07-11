@@ -20,3 +20,9 @@ target_link_libraries(testSQLPool PRIVATE
         Catch2::Catch2 Catch2::Catch2WithMain
         OpenSSL::SSL OpenSSL::Crypto
         spdlog::spdlog)
+
+add_executable(testSQLMapping testSQLMapping.cpp ${WebIMGFiles})
+target_link_libraries(testSQLMapping PRIVATE
+        Catch2::Catch2 Catch2::Catch2WithMain
+        OpenSSL::SSL OpenSSL::Crypto
+        spdlog::spdlog)

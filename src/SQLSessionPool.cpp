@@ -4,9 +4,9 @@
 
 #include "SQLSessionPool.h"
 
-SQLSessionPool::SQLSessionPool(boost::asio::io_context &ctx, std::string_view host,
+SQLSessionPool::SQLSessionPool(std::string_view host,
                                const boost::mysql::handshake_params &params, unsigned int num) :
-        ioContext(ctx), hostIP(host), parameters(params),
+        hostIP(host), parameters(params),
         sslContext(boost::asio::ssl::context::tls_client),
         connectionNum(num), semaphore(num)
 {

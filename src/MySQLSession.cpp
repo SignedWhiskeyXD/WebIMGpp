@@ -9,15 +9,20 @@ void MySQLSession::test(const char *name, boost::mysql::results& result) {
     sqlConnection.async_prepare_statement(sql, diag,
         [this, name, &result](boost::system::error_code ec, boost::mysql::statement tempStmt){
             boost::mysql::throw_on_error(ec, diag);
-            nextStmt = tempStmt;
-            executeTest(name, result);
+            sqlConnection.async_execute_statement(tempStmt, std::make_tuple(name), result, diag,
+                [this](boost::system::error_code ec){
+                    boost::mysql::throw_on_error(ec, diag);
+                });
         });
 }
 
-void MySQLSession::executeTest(const char *name, boost::mysql::results& result) {
-    std::tuple<std::string> t(name);
-    sqlConnection.async_execute_statement(nextStmt, t, result, diag,
-        [this](boost::system::error_code ec){
-            boost::mysql::throw_on_error(ec, diag);
-        });
+std::size_t MySQLSession::selectUserByName(std::string_view username) {
+    static const char* sql = "SELECT * FROM WebIMGppUsers WHERE username = ?";
+    boost::mysql::results result;
+    sqlConnection.execute_statement(blockingPrepare(sql), std::make_tuple(username.data()), result);
+    return result.rows().size();
+}
+
+boost::mysql::statement MySQLSession::blockingPrepare(std::string_view sql) {
+    return sqlConnection.prepare_statement(sql);
 }
