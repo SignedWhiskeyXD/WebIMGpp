@@ -6,10 +6,16 @@
 #define WEBIMG_REGISTER_H
 
 #include "ServletBase.h"
+#include "SQLSessionPool.h"
 
 class Register : public ServletBase{
 public:
+    explicit Register(SQLSessionPool& pool) : poolHandler(pool) {}
+
     HTTPResponse doPost(HTTPRequest &request) const override;
+
+private:
+    SQLSessionPool& poolHandler;
 };
 
 

@@ -14,7 +14,7 @@ TEST_CASE("testSQLMapping")
 
     MySQLPtr session = pool.waitPop();
 
-    auto rows = session->selectUserByName("wsmrxd");
+    auto rows = session->checkUsername("wsmrxd");
 
     pool.release(session);
 

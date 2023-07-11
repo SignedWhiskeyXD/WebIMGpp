@@ -12,11 +12,16 @@ HTTPResponse Login::doPost(HTTPRequest &request) const {
     if(!form.contains("user") || !form.contains("password") || request.uri != "/login"){
         return builder.BadRequest();
     }
-    std::string username = form["user"], password = form["password"].data();
+    std::string username = form["user"], password = form["password"];
     auto sqlSession = poolHandler.waitPop();
-    auto result = sqlSession->selectUserByName(username);
-    if(result == 1)
+    if(!sqlSession->checkUsername(username))
+        return builder.setStatus(401, "Unauthorized").setPayload("No such username!").build();
+
+    const std::string correctPassword = sqlSession->selectUser(username).password;
+    poolHandler.release(sqlSession);
+
+    if(password == correctPassword)
         return builder.setOK().setPayload("Access Granted!").build();
     else
-        return builder.setOK().setPayload("Invalid user!").build();
+        return builder.setStatus(401, "Unauthorized").setPayload("Password Invalid!").build();
 }

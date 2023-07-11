@@ -17,7 +17,7 @@ ImageServer::ImageServer(std::string_view address, uint16_t port):
         sqlSessionPool(address, boost::mysql::handshake_params("root", "wsmrxd", "db1"), 8)
 {
     ServletPtr hello = std::make_shared<HelloServlet>();
-    ServletPtr regi = std::make_shared<Register>();
+    ServletPtr regi = std::make_shared<Register>(sqlSessionPool);
     ServletPtr login = std::make_shared<Login>(sqlSessionPool);
     ServletMatcher::getInstance().addRule("/hello", hello);
     ServletMatcher::getInstance().addRule("/register", regi);

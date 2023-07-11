@@ -6,6 +6,7 @@
 #define WEBIMG_MYSQLSESSION_H
 
 #include <boost/mysql.hpp>
+#include "WebIMGppUser.h"
 
 class MySQLSession {
     friend class SQLSessionPool;
@@ -15,7 +16,11 @@ public:
 
     void test(const char *name, boost::mysql::results& result);
 
-    std::size_t selectUserByName(std::string_view username);
+    bool checkUsername(std::string_view username);
+
+    WebIMGppUser selectUser(std::string_view username);
+
+    bool addUser(std::string_view username, std::string_view password);
 
 private:
     boost::mysql::statement blockingPrepare(std::string_view sql);
