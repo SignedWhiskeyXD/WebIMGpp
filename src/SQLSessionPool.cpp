@@ -15,24 +15,28 @@ SQLSessionPool::SQLSessionPool(boost::asio::io_context &ctx, std::string_view ho
 }
 
 void SQLSessionPool::resolveHost() {
-    resolver.async_resolve(
-        hostIP.data(),
-        boost::mysql::default_port_string,
-        [this](boost::system::error_code ec,
-               boost::asio::ip::tcp::resolver::results_type results){
-            boost::mysql::throw_on_error(ec);
-            eps = std::move(results);
-            connectAll();
-        });
+    eps = resolver.resolve(hostIP.data(), boost::mysql::default_port_string);
+    connectAll();
+
+//    resolver.async_resolve(
+//        hostIP.data(),
+//        boost::mysql::default_port_string,
+//        [this](boost::system::error_code ec,
+//               boost::asio::ip::tcp::resolver::results_type results){
+//            boost::mysql::throw_on_error(ec);
+//            eps = std::move(results);
+//            connectAll();
+//        });
 }
 
 void SQLSessionPool::connectAll() {
     while(sessions.size() < connectionNum){
         sessions.emplace_back(ioContext, sslContext);
-        sessions.back().sqlConnection.async_connect(*eps.begin(), parameters, diag,
-            [this](boost::system::error_code ec){
-                boost::mysql::throw_on_error(ec, diag);
-            });
+        sessions.back().sqlConnection.connect(*eps.begin(), parameters);
+//        sessions.back().sqlConnection.async_connect(*eps.begin(), parameters, diag,
+//            [this](boost::system::error_code ec){
+//                boost::mysql::throw_on_error(ec, diag);
+//            });
     }
 }
 

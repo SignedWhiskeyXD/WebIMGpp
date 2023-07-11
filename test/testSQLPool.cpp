@@ -11,11 +11,15 @@ TEST_CASE("testSQLSessionPool")
 
     boost::mysql::handshake_params params("root", "wsmrxd", "db1");
 
+    boost::mysql::results results;
+
     SQLSessionPool pool(ioContext, "127.0.0.1", params, 4);
+
+    auto& session = pool.get();
+
+    session.test("Tadokoro", results);
 
     ioContext.run();
 
-    auto res = pool.test();
-
-    REQUIRE(res == "Tadokoro");
+    REQUIRE(results.rows().at(0).at(2).get_string() == "114514");
 }

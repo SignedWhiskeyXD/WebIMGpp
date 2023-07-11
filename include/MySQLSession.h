@@ -13,10 +13,16 @@ public:
     MySQLSession(boost::asio::io_context& ctx, boost::asio::ssl::context& sslCtx):
             sqlConnection(ctx, sslCtx) {}
 
-    std::string test();
+    void test(const char *name, boost::mysql::results& result);
 
 private:
+    void executeTest(const char *name, boost::mysql::results& result);
+
     boost::mysql::tcp_ssl_connection sqlConnection;
+
+    boost::mysql::diagnostics diag;
+
+    boost::mysql::statement nextStmt;
 };
 
 

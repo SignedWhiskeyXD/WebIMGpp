@@ -13,8 +13,8 @@ public:
     SQLSessionPool(boost::asio::io_context& ctx, std::string_view host,
                    const boost::mysql::handshake_params& params, unsigned int num);
 
-    std::string test(){
-        return sessions.front().test();
+    MySQLSession& get(){
+        return sessions.front();
     }
 
 private:
