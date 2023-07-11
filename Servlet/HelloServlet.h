@@ -13,6 +13,8 @@ public:
     HelloServlet() = default;
 
     HTTPResponse doGet(HTTPRequest& request) const override;
+
+    HTTPResponse doPost(HTTPRequest &request) const override;
 };
 
 #endif //WEBIMG_HELLOSERVLET_H

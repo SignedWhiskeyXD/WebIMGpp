@@ -3,7 +3,6 @@
 //
 
 #include "ThreadPool.h"
-#include "RequestParser.h"
 
 ThreadPool::ThreadPool(bool enableForceStop):
         useForceStop(enableForceStop) {}
@@ -41,7 +40,7 @@ bool ThreadPool::commit(ConnectionPtr connection) {
     if(stop) return false;
     {
         Guard guard(mtx);
-        connections.push(connection);
+        connections.push(std::move(connection));
     }
     cv_process_stop.notify_one();
     return true;
@@ -60,7 +59,6 @@ void ThreadPool::workerTask() {
         connections.pop();
         locker.unlock();
 
-        // TODO: 处理对获取连接的逻辑
         newConnection->handle();
     }
 }

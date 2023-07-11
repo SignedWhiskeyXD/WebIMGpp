@@ -4,8 +4,9 @@ project(WebIMG)
 set(CMAKE_CXX_STANDARD 20)
 set(ENABLE_UNIT_TEST ON)
 
-find_package(Boost REQUIRED COMPONENTS)
+find_package(Boost REQUIRED)
 find_package(spdlog REQUIRED)
+find_package(openssl REQUIRED)
 
 include_directories(${Boost_INCLUDE_DIR})
 include_directories(./include .)
@@ -21,7 +22,7 @@ if(WIN32)
 endif()
 
 add_executable(WebIMG main.cpp ${WebIMGFiles})
-target_link_libraries(WebIMG PRIVATE spdlog::spdlog)
+target_link_libraries(WebIMG PRIVATE spdlog::spdlog OpenSSL::SSL OpenSSL::Crypto)
 
 if(MSVC)
     target_compile_options(WebIMG PRIVATE /wd4819)

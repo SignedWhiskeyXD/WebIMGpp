@@ -14,3 +14,9 @@ add_executable(testBoostMySQL testBoostMySQL.cpp)
 target_link_libraries(testBoostMySQL PRIVATE
         Catch2::Catch2 Catch2::Catch2WithMain
         OpenSSL::SSL OpenSSL::Crypto)
+
+add_executable(testSQLPool testSQLPool.cpp ${WebIMGFiles})
+target_link_libraries(testSQLPool PRIVATE
+        Catch2::Catch2 Catch2::Catch2WithMain
+        OpenSSL::SSL OpenSSL::Crypto
+        spdlog::spdlog)

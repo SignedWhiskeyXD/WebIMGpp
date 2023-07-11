@@ -29,6 +29,10 @@ public:
 
     ResponseBuilder& setPayload(const std::string& payload);
 
+    HTTPResponse BadRequest();
+
+    HTTPResponse NotFound();
+
     std::string toString() const;
 
     HTTPResponse build();

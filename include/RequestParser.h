@@ -14,6 +14,8 @@ class RequestParser {
 public:
     static std::pair<int, HTTPRequest> parseRequest(std::stringstream &requestStream);
 
+    static std::unordered_map<std::string_view, std::string_view> parseForm(std::string_view formString);
+
 private:
     static int parseFirstLine(HTTPRequest &parsedRequest, std::string_view lineView);
 

@@ -14,6 +14,7 @@ public:
     ServletBase() = default;
 
     HTTPResponse onHandle(HTTPRequest& request) const {
+        if(request.httpVersion != "HTTP/1.1") doDefault(request);
         if(request.method == "GET") return doGet(request);
         if(request.method == "POST") return doPost(request);
         return doDefault(request);

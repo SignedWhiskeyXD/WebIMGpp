@@ -91,4 +91,38 @@ void ResponseBuilder::setServerName() {
     setHeader("Server", "WebIMGpp Experimental");
 }
 
+HTTPResponse ResponseBuilder::BadRequest() {
+    static const char* payload400 = "<!DOCTYPE html>\n"
+                                    "<html>\n"
+                                    "<head>\n"
+                                    "  <title>400 Bad Request</title>\n"
+                                    "</head>\n"
+                                    "<body>\n"
+                                    "  <h1>400 Bad Request</h1>\n"
+                                    "  <p>Invalid Request</p>\n"
+                                    "</body>\n"
+                                    "</html>";
+    setStatus(400, "Bad Request");
+    contentType("text/html");
+    setPayload(payload400);
+    return response;
+}
+
+HTTPResponse ResponseBuilder::NotFound() {
+    static const char* payload404 = "<!DOCTYPE html>\n"
+                                    "<html>\n"
+                                    "<head>\n"
+                                    "  <title>404 Not Found</title>\n"
+                                    "</head>\n"
+                                    "<body>\n"
+                                    "  <h1>404 Not Found</h1>\n"
+                                    "  <p>404 Not Found</p>\n"
+                                    "</body>\n"
+                                    "</html>";
+    setStatus(400, "Bad Request");
+    contentType("text/html");
+    setPayload(payload404);
+    return response;
+}
+
 
