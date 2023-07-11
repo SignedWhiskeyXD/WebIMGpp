@@ -6,6 +6,7 @@
 #define WEBIMG_SQLSESSIONPOOL_H
 
 #include <boost/asio.hpp>
+#include <semaphore>
 #include "MySQLSession.h"
 
 class SQLSessionPool {
@@ -13,24 +14,27 @@ public:
     SQLSessionPool(boost::asio::io_context& ctx, std::string_view host,
                    const boost::mysql::handshake_params& params, unsigned int num);
 
-    MySQLSession& get(){
-        return sessions.front();
+    MySQLPtr waitPop();
+
+    void release(MySQLPtr session);
+
+    std::size_t available() const noexcept{
+        Guard guard(mtx);
+        return sessions.size();
     }
 
 private:
-    void resolveHost();
-
-    void connectAll();
+    void init() noexcept;
 
     boost::asio::io_context& ioContext;
 
     boost::asio::ssl::context sslContext;
 
-    boost::asio::ip::tcp::resolver resolver;
+    std::vector<MySQLPtr> sessions;
 
-    boost::asio::ip::tcp::resolver::results_type eps;
+    std::counting_semaphore<20> semaphore;
 
-    std::vector<MySQLSession> sessions;
+    mutable std::mutex mtx;
 
     std::string_view hostIP;
 
@@ -38,7 +42,7 @@ private:
 
     const unsigned int connectionNum;
 
-    boost::mysql::diagnostics diag;
+    using Guard = std::lock_guard<std::mutex>;
 };
 
 

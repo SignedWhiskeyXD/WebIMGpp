@@ -11,15 +11,21 @@ TEST_CASE("testSQLSessionPool")
 
     boost::mysql::handshake_params params("root", "wsmrxd", "db1");
 
-    boost::mysql::results results;
+    boost::mysql::results results1, results2;
 
     SQLSessionPool pool(ioContext, "127.0.0.1", params, 4);
 
-    auto& session = pool.get();
+    MySQLPtr session1 = pool.waitPop(), session2 = pool.waitPop();
 
-    session.test("Tadokoro", results);
+    session1->test("Tadokoro", results1);
+    session2->test("wsmrxd",results2);
 
     ioContext.run();
 
-    REQUIRE(results.rows().at(0).at(2).get_string() == "114514");
+    pool.release(session1);
+    pool.release(session2);
+
+    REQUIRE(results1.rows().at(0).at(2).get_string() == "114514");
+    REQUIRE(results2.rows().at(0).at(3).get_string() == "Wuhan");
+    REQUIRE(pool.available() == 4);
 }
