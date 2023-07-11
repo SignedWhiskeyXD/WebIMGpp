@@ -12,10 +12,7 @@ class HelloServlet : public ServletBase{
 public:
     HelloServlet() = default;
 
-    HTTPResponse onHandle(HTTPRequest& request) override;
-
-private:
-    ResponseBuilder builder;
+    HTTPResponse doGet(HTTPRequest& request) const override;
 };
 
 #endif //WEBIMG_HELLOSERVLET_H

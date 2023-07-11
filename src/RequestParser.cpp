@@ -4,7 +4,7 @@
 
 #include "RequestParser.h"
 
-std::pair<int, HTTPRequest> RequestParser::parseRequest(std::istream &requestStream) {
+std::pair<int, HTTPRequest> RequestParser::parseRequest(std::stringstream &requestStream) {
     enum parseState{
         FIRST_LINE = 0,
         HEADERS,
@@ -14,49 +14,50 @@ std::pair<int, HTTPRequest> RequestParser::parseRequest(std::istream &requestStr
 
     int currentState = parseState::FIRST_LINE;
     std::string line;
-    while(std::getline(requestStream, line)){
-        std::stringstream lineStream(line);
+    while(currentState < PAYLOAD && std::getline(requestStream, line)){
         switch (currentState) {
             case FIRST_LINE:{
-                int flag = parseFirstLine(ret.second, lineStream);
+                int flag = parseFirstLine(ret.second, line);
                 if(flag == GOOD_FIRST_LINE) ++currentState;
                 else return ret;
                 break;
             }
             case HEADERS:{
-                int flag = parseHeaders(ret.second, lineStream);
+                int flag = parseHeaders(ret.second, line);
                 if(flag == CONTINUE) continue;
-                else if(flag == GOOD_HEADERS){
-                    ret.first = 200;
-                    return ret;
-                }
-                else return ret;
+                else if(flag == GOOD_HEADERS)
+                    ++currentState;
+                break;
             }
             default:{
                 break;
             }
         }
     }
-    // TODO: 存在未覆盖返回内容的分支
+    return ret;
 }
 
-int RequestParser::parseFirstLine(HTTPRequest &parsedRequest, std::stringstream &lineStream) {
+int RequestParser::parseFirstLine(HTTPRequest &parsedRequest, std::string_view lineView) {
+    std::stringstream lineStream(lineView.data());
     lineStream >> parsedRequest.method
-               >> parsedRequest.uri
-               >> parsedRequest.httpVersion;
+        >> parsedRequest.uri
+        >> parsedRequest.httpVersion;
 
     return !parsedRequest.method.empty() &&
            !parsedRequest.uri.empty() &&
            !parsedRequest.httpVersion.empty() ? GOOD_FIRST_LINE : BAD_METHOD;
 }
 
-int RequestParser::parseHeaders(HTTPRequest &parsedRequest, std::stringstream &lineStream) {
-    if(lineStream.str().length() < 3) return GOOD_HEADERS;
+int RequestParser::parseHeaders(HTTPRequest &parsedRequest, std::string_view lineView) {
+    if(lineView.length() < 5) return GOOD_HEADERS;
     auto currentHeader = std::make_pair<std::string, std::string>("", "");
 
-    lineStream >> currentHeader.first >> currentHeader.second;
-    currentHeader.first.pop_back();
-    parsedRequest.headers.insert(currentHeader);
+    auto div = lineView.find(": ");
+    if(div != std::string::npos && lineView.begin() + div + 2 < lineView.end() - 1) {
+        currentHeader.first = std::string(lineView.begin(), lineView.begin() + div);
+        currentHeader.second = std::string(lineView.begin() + div + 2, lineView.end() - 1);
+        parsedRequest.headers.insert(currentHeader);
+    }
 
     return !currentHeader.first.empty() &&
            !currentHeader.second.empty() ? CONTINUE : BAD_HEADER_CONTINUE;

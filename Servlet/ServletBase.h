@@ -7,10 +7,30 @@
 
 #include "HTTPRequest.h"
 #include "HTTPResponse.h"
+#include "ResponseBuilder.h"
 
 class ServletBase{
 public:
-    virtual HTTPResponse onHandle(HTTPRequest& request) = 0;
+    ServletBase() = default;
+
+    HTTPResponse onHandle(HTTPRequest& request) const {
+        if(request.method == "GET") return doGet(request);
+        if(request.method == "POST") return doPost(request);
+        return doDefault(request);
+    }
+
+protected:
+    virtual HTTPResponse doGet(HTTPRequest& request) const {
+        return doDefault(request);
+    }
+
+    virtual HTTPResponse doPost(HTTPRequest& request) const {
+        return doDefault(request);
+    }
+
+    virtual HTTPResponse doDefault(HTTPRequest& request) const {
+        return ResponseBuilder().setStatus(400, "Bad Request").setPayload("Invalid Request!").build();
+    }
 };
 
 using ServletPtr = std::shared_ptr<ServletBase>;

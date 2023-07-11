@@ -6,11 +6,14 @@
 #define WEBIMG_SERVLETMATCHER_H
 
 #include <unordered_map>
+#include <Servlet/RootServlet.h>
 #include "Servlet/ServletBase.h"
 
 class ServletMatcher{
 public:
-    ServletMatcher() = default;
+    ServletMatcher(): matchTable(){
+        matchTable["/"] = std::make_shared<RootServlet>();
+    }
 
     static ServletMatcher& getInstance(){
         static ServletMatcher instance;

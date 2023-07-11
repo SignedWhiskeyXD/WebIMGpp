@@ -12,13 +12,12 @@
 
 class RequestParser {
 public:
-
-    static std::pair<int, HTTPRequest> parseRequest(std::istream& requestStream);
+    static std::pair<int, HTTPRequest> parseRequest(std::stringstream &requestStream);
 
 private:
-    static int parseFirstLine(HTTPRequest &parsedRequest, std::stringstream &lineStream);
+    static int parseFirstLine(HTTPRequest &parsedRequest, std::string_view lineView);
 
-    static int parseHeaders(HTTPRequest &parsedRequest, std::stringstream &lineStream);
+    static int parseHeaders(HTTPRequest &parsedRequest, std::string_view lineView);
 
     enum{
         BAD_METHOD,

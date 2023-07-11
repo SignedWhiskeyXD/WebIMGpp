@@ -15,10 +15,13 @@ TEST_CASE("testMatcher")
 
     HTTPRequest request1{"GET", "/hello", "HTTP/1.1"};
     HTTPRequest request2{"GET", "/hello/wtf_is_this", "HTTP/1.1"};
+    HTTPRequest request3{"GET", "/favicon.ico", "HTTP/1.1"};
 
     auto servlet1 = matcher.match(request1);
     auto servlet2 = matcher.match(request2);
+    auto servlet3 = matcher.match(request3);
 
     REQUIRE(servlet1 == hello);
     REQUIRE(servlet2 == hello);
+    REQUIRE(servlet3 != nullptr);
 }

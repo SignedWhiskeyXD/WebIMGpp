@@ -3,7 +3,8 @@
 //
 #include "HelloServlet.h"
 
-HTTPResponse HelloServlet::onHandle(HTTPRequest& request) {
+HTTPResponse HelloServlet::doGet(HTTPRequest& request) const {
+    ResponseBuilder builder;
     if(request.method == "GET" && request.uri == "/hello" && request.httpVersion == "HTTP/1.1"){
         std::string payload = "Welcome to WebIMGpp experimental!";
         builder.setOK().setPayload(payload).contentType("text/plain");

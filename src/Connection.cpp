@@ -28,15 +28,15 @@ void Connection::readSocket() {
                     std::stringstream ss(view.data());
                     request = RequestParser::parseRequest(ss).second;
 
+                    auto payloadPos = view.find("\r\n\r\n");
+                    if(payloadPos != std::string::npos && payloadPos + 4 < length){
+                        request.payload = std::string(buffer.begin() + payloadPos + 4,
+                                                      buffer.begin() + length);
+                    }
+
                     // TODO: 已经解析好请求，响应之
                     auto servlet = ServletMatcher::getInstance().match(request);
-                    if(servlet != nullptr)
-                        response = servlet->onHandle(request);
-                    else {
-                        response = ResponseBuilder()
-                                    .setStatus(400, "Bad Request")
-                                    .setPayload("WTF R U DOING").build();
-                    }
+                    response = servlet->onHandle(request);
                     writeSocket();
                 }
             }

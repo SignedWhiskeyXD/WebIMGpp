@@ -27,5 +27,5 @@ ServletPtr ServletMatcher::match(HTTPRequest &request) {
         if(matchTable.contains(candidate)) return matchTable[candidate];
         candidates.pop();
     }
-    return nullptr;
+    return matchTable["/"];
 }
