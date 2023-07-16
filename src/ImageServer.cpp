@@ -8,20 +8,24 @@
 #include "Servlet/HelloServlet.h"
 #include "Servlet/Register.h"
 #include "Servlet/Login.h"
+#include "Servlet/Upload.h"
 #include "ServletMatcher.h"
 
-ImageServer::ImageServer(std::string_view address, uint16_t port):
+ImageServer::ImageServer(std::string_view address, uint16_t port, uint16_t threadNum, uint16_t sqlNum) :
         ioContext(1),
         acceptor(ioContext, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port)),
-        threadPool(true),
-        sqlSessionPool(address, boost::mysql::handshake_params("root", "wsmrxd", "db1"), 8)
+        threadPool(true, threadNum),
+        sqlSessionPool(address, boost::mysql::handshake_params("root", "wsmrxd", "db1"), sqlNum)
 {
     ServletPtr hello = std::make_shared<HelloServlet>();
     ServletPtr regi = std::make_shared<Register>(sqlSessionPool);
     ServletPtr login = std::make_shared<Login>(sqlSessionPool);
+    ServletPtr upload = std::make_shared<Upload>();
+
     ServletMatcher::getInstance().addRule("/hello", hello);
     ServletMatcher::getInstance().addRule("/register", regi);
     ServletMatcher::getInstance().addRule("/login", login);
+    ServletMatcher::getInstance().addRule("/upload", upload);
     do_accept();
 }
 
@@ -30,7 +34,7 @@ void ImageServer::run() {
         std::stringstream ss;
         ss << std::this_thread::get_id();
         spdlog::info("starting at {}", ss.str());
-        threadPool.init(8);
+        threadPool.init();
         ioContext.run();
     }
 }

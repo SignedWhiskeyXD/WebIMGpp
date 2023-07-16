@@ -16,7 +16,7 @@ class ThreadPool final {
     using uGuard = std::unique_lock<std::mutex>;
 
 public:
-    explicit ThreadPool(bool enableForceStop);
+    explicit ThreadPool(bool enableForceStop, uint16_t threadNum);
 
     ThreadPool() = delete;
 
@@ -31,7 +31,7 @@ public:
             waitStop();
     }
 
-    void init(int workerNum);
+    void init();
 
     // 将一个任务加入到任务队列
     bool commit(ConnectionPtr connection);
@@ -52,6 +52,8 @@ private:
     std::condition_variable cv_process_stop;
 
     std::mutex mtx;
+
+    uint16_t threadNum;
 
     bool useForceStop;
 

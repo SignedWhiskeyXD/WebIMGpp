@@ -12,7 +12,7 @@
 
 class ImageServer{
 public:
-    ImageServer(std::string_view address, uint16_t port);
+    ImageServer(std::string_view address, uint16_t port, uint16_t threadNum, uint16_t sqlNum);
 
     ImageServer() = delete;
 

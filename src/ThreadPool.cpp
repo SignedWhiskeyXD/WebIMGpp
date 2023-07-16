@@ -4,11 +4,11 @@
 
 #include "ThreadPool.h"
 
-ThreadPool::ThreadPool(bool enableForceStop):
-        useForceStop(enableForceStop) {}
+ThreadPool::ThreadPool(bool enableForceStop, uint16_t threadNum) :
+        useForceStop(enableForceStop), threadNum(threadNum) {}
 
-void ThreadPool::init(int workerNum){
-    while(workers.size() < workerNum){
+void ThreadPool::init() {
+    while(workers.size() < threadNum){
         workers.emplace_back(&ThreadPool::workerTask, this);
     }
 }
