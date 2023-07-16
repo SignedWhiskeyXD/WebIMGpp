@@ -26,10 +26,13 @@ ImageServer::ImageServer(std::string_view address, uint16_t port):
 }
 
 void ImageServer::run() {
-    if(acceptor.is_open())
-        spdlog::info("starting");
-    threadPool.init(8);
-    ioContext.run();
+    if(acceptor.is_open()) {
+        std::stringstream ss;
+        ss << std::this_thread::get_id();
+        spdlog::info("starting at {}", ss.str());
+        threadPool.init(8);
+        ioContext.run();
+    }
 }
 
 void ImageServer::stop() {
@@ -45,8 +48,9 @@ void ImageServer::do_accept() {
 
             if (!ec){
                 auto newConnection = std::make_shared<Connection>
-                    (std::move(socket), connectionPool);
+                    (std::move(socket), connectionPool, threadPool);
                 connectionPool.addConnection(newConnection);
+                spdlog::info("Accepted, num of connections: {}", connectionPool.size());
                 threadPool.commit(newConnection);
             }
 

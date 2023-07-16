@@ -12,13 +12,14 @@
 #include "HTTPRequest.h"
 
 class ConnectionPool;
+class ThreadPool;
 
 class Connection : public std::enable_shared_from_this<Connection>{
 public:
     friend class RequestParser;
 
-    explicit Connection(boost::asio::ip::tcp::socket sock, ConnectionPool& pool):
-        socket(std::move(sock)), poolHandler(pool) { }
+    explicit Connection(boost::asio::ip::tcp::socket sock, ConnectionPool& pool, ThreadPool& threadPool):
+        socket(std::move(sock)), poolHandler(pool), queueHandler(threadPool) { }
 
     Connection() = delete;
 
@@ -35,19 +36,37 @@ public:
     void disconnect();
 
 private:
+    enum {
+        Start,
+        Handle,
+        Write,
+        KeepRead,
+        KeepHandle
+    } connectionState = Start;
+
     void readSocket();
 
+    void doHandle();
+
     void writeSocket();
+
+    void keepReadSocket();
+
+    void keepHandle();
 
     boost::asio::ip::tcp::socket socket;
 
     ConnectionPool& poolHandler;
+
+    ThreadPool& queueHandler;
 
     HTTPRequest request;
 
     HTTPResponse response;
 
     std::array<char, 8192> buffer;
+
+    std::size_t receiveLength;
 };
 
 using ConnectionPtr = std::shared_ptr<Connection>;
